@@ -5854,6 +5854,10 @@ impl Player {
         } else {
             screen_handler.send_content_updates();
         }
+
+        if let Some(position) = self.open_container_pos.load() {
+            crate::block::blocks::chests::update_chest_neighbors(&self.world(), &position);
+        }
     }
 
     /// Handles when the player clicks a button in a container (e.g. Enchantment Table)

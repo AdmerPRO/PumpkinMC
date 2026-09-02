@@ -6,6 +6,7 @@ use pumpkin_data::BlockStateId;
 use pumpkin_data::block_properties::{ChestLikeProperties, ChestType, HorizontalFacing};
 use pumpkin_data::entity::EntityPose;
 use pumpkin_data::loot_table::get_loot_table;
+use pumpkin_data::tag::Taggable;
 use pumpkin_data::{Block, BlockDirection, translation};
 use pumpkin_inventory::double::DoubleInventory;
 use pumpkin_inventory::generic_container_screen_handler::{create_generic_9x3, create_generic_9x6};
@@ -70,6 +71,30 @@ impl ScreenHandlerFactory for ChestScreenFactory {
 
 // Shared chest behavior implementations
 const LID_ANIMATION_EVENT_TYPE: u8 = 1;
+
+/// Notifies redstone components after a chest inventory changes.
+///
+/// Both halves need to send updates because a comparator may read either half
+/// of a double chest while both halves expose the combined inventory.
+pub fn update_chest_neighbors(world: &Arc<World>, position: &BlockPos) {
+    let (block, state_id) = world.get_block_and_state_id(position);
+    if !block.has_tag(&pumpkin_data::tag::Block::C_CHESTS_WOODEN)
+        && !block.has_tag(&pumpkin_data::tag::Block::MINECRAFT_COPPER_CHESTS)
+    {
+        return;
+    }
+
+    world.update_neighbors(position, None);
+
+    let properties = ChestLikeProperties::from_state_id(state_id);
+    let connected_towards = match properties.r#type {
+        ChestType::Single => return,
+        ChestType::Left => properties.facing.rotate_clockwise(),
+        ChestType::Right => properties.facing.rotate_counter_clockwise(),
+    };
+    let connected_position = position.offset(connected_towards.to_offset());
+    world.update_neighbors(&connected_position, None);
+}
 
 fn on_place_chest_impl(args: &OnPlaceArgs<'_>) -> BlockStateId {
     let mut chest_props = ChestLikeProperties::default(args.block);
