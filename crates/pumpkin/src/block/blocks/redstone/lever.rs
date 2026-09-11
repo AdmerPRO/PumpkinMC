@@ -6,7 +6,7 @@ use crate::block::{
 };
 use pumpkin_data::{
     Block, BlockDirection, BlockStateId, HorizontalFacingExt,
-    block_properties::{AttachFace, LeverLikeProperties},
+    block_properties::{AttachFace, HorizontalFacing, LeverLikeProperties},
 };
 use pumpkin_macros::pumpkin_block;
 use pumpkin_util::math::position::BlockPos;
