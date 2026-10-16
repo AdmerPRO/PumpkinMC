@@ -231,6 +231,7 @@ fn handle_interrupt() {
 }
 
 fn handle_panic(panic_info: &PanicHookInfo<'_>) {
+    pumpkin::tui::restore_terminal();
     // Generate a crash report.
     let crash_report = {
         // We capture the backtraces here, and not in the

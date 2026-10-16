@@ -25,6 +25,8 @@ pub mod networking;
 pub mod plugins;
 /// Recipe system configuration options.
 pub mod recipe;
+/// Terminal dashboard configuration options.
+pub mod tui;
 
 /// Resource pack configuration options.
 pub mod resource_pack;
@@ -152,6 +154,8 @@ impl LoadConfiguration for PumpkinConfig {
 pub struct AdvancedConfiguration {
     /// Logging-related configuration such as log levels and output behaviour.
     pub logging: LoggingConfig,
+    /// Interactive terminal dashboard settings.
+    pub tui: tui::TuiConfig,
     /// Resource pack configuration, including enforcement and pack metadata.
     pub resource_pack: ResourcePackConfig,
     /// World and level-related settings beyond basic configuration.

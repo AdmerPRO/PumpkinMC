@@ -68,6 +68,8 @@ num-bigint.workspace = true
 
 # Console line reading
 rustyline.workspace = true
+crossterm.workspace = true
+ratatui.workspace = true
 
 # encryption
 aes.workspace = true

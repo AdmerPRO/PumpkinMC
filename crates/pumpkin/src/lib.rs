@@ -62,6 +62,7 @@ pub mod net;
 pub mod plugin;
 pub mod server;
 pub mod telemetry;
+pub mod tui;
 pub mod world;
 
 pub struct LoggingConfig {
@@ -80,6 +81,8 @@ pub static LOGGER_IMPL: LazyLock<Arc<OnceLock<LoggerOption>>> =
 pub fn init_logger(advanced_config: &AdvancedConfiguration) {
     use tracing_subscriber::EnvFilter;
     use tracing_subscriber::fmt;
+
+    tui::prepare(advanced_config);
 
     let logger = advanced_config.logging.enabled.then(|| {
         let level = std::env::var("RUST_LOG")
@@ -117,7 +120,12 @@ pub fn init_logger(advanced_config: &AdvancedConfiguration) {
         let (logger, rl): (
             ConsoleWriter,
             Option<Editor<PumpkinCommandCompleter, FileHistory>>,
-        ) = if advanced_config.commands.use_tty && stdin().is_terminal() {
+        ) = if tui::is_active() {
+            (
+                ConsoleWriter::new(Some(Box::new(tui::ConsolePrinter))),
+                None,
+            )
+        } else if advanced_config.commands.use_tty && stdin().is_terminal() {
             let rl_config = Config::builder()
                 .auto_add_history(true)
                 .completion_type(rustyline::CompletionType::List)
@@ -450,7 +458,9 @@ impl PumpkinServer {
     }
 
     pub async fn start(&self) {
-        if self.server.advanced_config.commands.use_console
+        let dashboard = tui::start(&self.server);
+        if !tui::is_active()
+            && self.server.advanced_config.commands.use_console
             && let Some((wrapper, _, _)) = LOGGER_IMPL.wait()
         {
             if let Some(rl) = wrapper.take_readline() {
@@ -537,6 +547,10 @@ impl PumpkinServer {
         self.server.shutdown().await;
 
         info!("Completed save!");
+
+        if let Some(dashboard) = dashboard {
+            dashboard.finish().await;
+        }
 
         if let Some((wrapper, _, _)) = LOGGER_IMPL.wait()
             && let Some(rl) = wrapper.take_readline()
@@ -754,17 +768,7 @@ fn setup_stdin_console(server: &Arc<Server>) {
         while !SHOULD_STOP.load(Ordering::Relaxed)
             && let Some(command) = rx.recv().await
         {
-            let mut event = ServerCommandEvent::new(command.clone());
-            server_clone
-                .plugin_manager
-                .fire(&server_clone, &mut event)
-                .await;
-            if !event.cancelled {
-                server_clone.command_dispatcher.load().handle_command(
-                    &command::CommandSender::Console.into_source(&server_clone),
-                    command.as_str(),
-                );
-            }
+            dispatch_console_command(&server_clone, &command).await;
         }
     });
 }
@@ -825,14 +829,7 @@ fn setup_console(mut rl: Editor<PumpkinCommandCompleter, FileHistory>, server: A
             };
 
             if let Some(line) = result {
-                let mut event = ServerCommandEvent::new(line.clone());
-                server.plugin_manager.fire(&server, &mut event).await;
-                if !event.cancelled {
-                    server.command_dispatcher.load().handle_command(
-                        &command::CommandSender::Console.into_source(&server),
-                        &line,
-                    );
-                }
+                dispatch_console_command(&server, &line).await;
                 let _ = tx_reply.send(1).await;
             } else {
                 break;
@@ -841,6 +838,17 @@ fn setup_console(mut rl: Editor<PumpkinCommandCompleter, FileHistory>, server: A
         drop(rx);
         debug!("Stopped console commands task");
     });
+}
+
+async fn dispatch_console_command(server: &Arc<Server>, line: &str) {
+    let mut event = ServerCommandEvent::new(line.to_string());
+    server.plugin_manager.fire(server, &mut event).await;
+    if !event.cancelled {
+        server
+            .command_dispatcher
+            .load()
+            .handle_command(&command::CommandSender::Console.into_source(server), line);
+    }
 }
 
 fn scrub_address(ip: &str) -> String {

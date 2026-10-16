@@ -278,7 +278,7 @@ impl GzipRollingLogger {
     }
 }
 
-fn remove_ansi_color_code(s: &str) -> String {
+pub(crate) fn remove_ansi_color_code(s: &str) -> String {
     let mut result = String::with_capacity(s.len());
     let mut it = s.chars();
 

@@ -151,6 +151,11 @@ impl fmt::Display for CommandSender {
 impl CommandSender {
     pub fn send_message(&self, text: TextComponent) {
         match self {
+            Self::Console if crate::tui::is_active() => {
+                crate::tui::push_log(&crate::logging::remove_ansi_color_code(
+                    &text.to_pretty_console(),
+                ));
+            }
             #[allow(clippy::print_stdout)]
             Self::Console => println!("{}", text.to_pretty_console()),
             Self::Player(c) => c.send_system_message(&text),

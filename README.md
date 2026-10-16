@@ -16,6 +16,26 @@ and customizable experience. It prioritizes performance and player enjoyment whi
 
 </div>
 
+## Terminal dashboard
+
+Pumpkin displays an interactive dashboard when standard input and output are terminals.
+It shows the server process's CPU usage and RAM usage, the online player count and
+player list, and console logs. Operators are highlighted in yellow and marked `[OP]`.
+CPU usage counts 100% per CPU core. Resource usage and players refresh every second.
+
+Enter a console command and press Enter to run it. Use Tab for completion, Up/Down for command history,
+Page Up/Page Down to scroll logs, and Alt+Up/Down to scroll players. Ctrl+C stops the
+server. The `commands.use_console` setting also controls dashboard command input.
+
+To use the regular console, set this in `pumpkin.toml` and restart the server:
+
+```toml
+[tui]
+enabled = false
+```
+
+The regular console is used automatically when input or output is redirected.
+
 ## Goals
 
 - **Performance**: Leveraging multi-threading for maximum speed and efficiency.
