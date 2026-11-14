@@ -237,6 +237,12 @@ pub const fn entity_type_to_bedrock_identifier(entity_type: &EntityType) -> &'st
     }
 }
 
+/// Reports whether an interaction handled the action and used the held item.
+pub struct EntityInteractionResult {
+    pub handled: bool,
+    pub item_used: bool,
+}
+
 pub trait EntityBase: Send + Sync + std::any::Any {
     fn write_nbt(&self, nbt: &mut NbtCompound) {
         self.get_entity().write_nbt(nbt);
@@ -881,6 +887,25 @@ pub trait EntityBase: Send + Sync + std::any::Any {
         _hand: pumpkin_util::Hand,
     ) -> Option<bool> {
         None
+    }
+
+    fn interact_with_hand_result(
+        &self,
+        player: &Arc<Player>,
+        item_stack: &mut ItemStack,
+        hand: pumpkin_util::Hand,
+    ) -> Option<EntityInteractionResult> {
+        if let Some(handled) = interact_with_shears(self, player, item_stack, hand) {
+            return Some(EntityInteractionResult {
+                handled,
+                item_used: true,
+            });
+        }
+        self.interact_with_hand(player, item_stack, hand)
+            .map(|handled| EntityInteractionResult {
+                handled,
+                item_used: false,
+            })
     }
 
     fn set_on_fire_for(&self, seconds: f32) {
@@ -4940,7 +4965,7 @@ impl Entity {
     /// `Some(false)` means no cut succeeded; callers must not fall through to shearing.
     pub fn shear_off_all_leash_connections(
         &self,
-        caller: &dyn EntityBase,
+        caller: &(impl EntityBase + ?Sized),
         player: Option<&Arc<Player>>,
     ) -> Option<bool> {
         let world = self.world.load();
@@ -6391,6 +6416,32 @@ impl Flag {
             Self::FallFlying => Some(entity_data_flag::GLIDING),
             Self::Glowing => None,
         }
+    }
+}
+
+fn interact_with_shears(
+    target: &(impl EntityBase + ?Sized),
+    player: &Arc<Player>,
+    stack: &mut ItemStack,
+    hand: pumpkin_util::Hand,
+) -> Option<bool> {
+    if stack.item != &pumpkin_data::item::Item::SHEARS {
+        return None;
+    }
+    if let Some(sheared) = target
+        .get_entity()
+        .shear_off_all_leash_connections(target, Some(player))
+    {
+        if sheared {
+            let _ = player.damage_item_stack(stack, 1);
+        }
+        return Some(sheared);
+    }
+    let mob = target.get_mob()?;
+    if mob.can_shear_equipment(player) && !player.get_entity().is_sneaking() {
+        mob.attempt_to_shear_equipment_with_hand(player, stack, hand)
+    } else {
+        None
     }
 }
 

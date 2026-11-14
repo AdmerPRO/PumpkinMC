@@ -3,7 +3,6 @@ use std::sync::{Arc, Weak};
 
 use pumpkin_data::Block;
 use pumpkin_data::damage::DamageType;
-use pumpkin_data::data_component_impl::EquipmentSlot;
 use pumpkin_data::entity::EntityType;
 use pumpkin_data::environment_attribute::EnvironmentAttribute;
 use pumpkin_data::game_event::GameEvent;
@@ -253,9 +252,6 @@ impl Mob for SnowGolemEntity {
 
     fn mob_ai_step(&self) {
         let entity = self.get_entity();
-        if entity.is_in_water_or_rain() {
-            self.damage(self, 1.0, DamageType::DROWN);
-        }
         let world = entity.world.load();
         if EnvironmentAttributes::new(&world).get_value_bool(
             EnvironmentAttribute::GameplaySnowGolemMelts,
@@ -334,89 +330,19 @@ impl Mob for SnowGolemEntity {
         item_stack: &mut ItemStack,
         hand: Hand,
     ) -> Option<bool> {
-        if !self.mob_entity.living_entity.is_alive() {
-            return Some(false);
-        }
-        let is_named_name_tag = item_stack.item == &Item::NAME_TAG
-            && item_stack
-                .get_data_component::<pumpkin_data::data_component_impl::CustomNameImpl>()
-                .is_some();
-        if !is_named_name_tag
-            && item_stack.item != &Item::SHEARS
-            && item_stack.item != &Item::LEAD
-            && self
-                .get_entity()
-                .get_leash_holder()
-                .is_none_or(|holder| holder.get_entity().entity_id != player.entity_id())
-        {
-            return None;
-        }
-        let before = item_stack.clone();
-        let interacted = if is_named_name_tag {
-            // Mob.checkAndHandleImportantInteractions precedes common leash interactions.
-            let entity = self.get_entity();
-            let world = entity.world.load();
-            let server = world.server.upgrade()?;
-            let golem = world.get_entity_by_id(entity.entity_id)?;
-            server
-                .item_registry
-                .get_pumpkin_item(item_stack.item.id)?
-                .use_on_entity(item_stack, player, golem);
-            true
-        } else if item_stack.get_item() != &Item::SHEARS {
-            self.mob_entity
-                .mob_interact(player, item_stack, self.can_be_leashed())
-        } else if let Some(sheared) = self
-            .get_entity()
-            .shear_off_all_leash_connections(self, Some(player))
-        {
-            if sheared {
-                let _ = player.damage_item_stack(item_stack, 1);
-            }
-            sheared
-        } else if self.can_shear_equipment(player)
-            && !player.get_entity().is_sneaking()
-            && let Some(sheared) =
-                self.attempt_to_shear_equipment_with_hand(player, item_stack, hand)
-        {
-            sheared
-        } else {
-            self.interact_with_shears(player, item_stack, hand)
-        };
-        if interacted {
-            self.get_entity().world.load().emit_game_event_with_context(
-                GameEvent::EntityInteract.name(),
-                self.get_entity().pos.load(),
-                &GameEventContext {
-                    source_entity: Some(player.as_ref()),
-                },
-            );
-        }
-        if !item_stack.are_equal(&before) {
-            player.increment_stat(
-                crate::entity::player::statistics::StatisticCategory::Used,
-                i32::from(before.item.id),
-                1,
-            );
-        }
-        if before.is_damageable() && item_stack.is_empty() {
-            let world = self.get_entity().world.load();
-            player.increment_stat(
-                crate::entity::player::statistics::StatisticCategory::Broken,
-                i32::from(before.item.id),
-                1,
-            );
-            let slot = match hand {
-                Hand::Right => EquipmentSlot::MAIN_HAND,
-                Hand::Left => EquipmentSlot::OFF_HAND,
-            };
-            world.send_entity_status(
-                player.get_entity(),
-                crate::entity::equipment_break_status(&slot),
-                pumpkin_protocol::bedrock::server::actor_event::ActorEventID::None,
-            );
-        }
-        Some(interacted)
+        Some(self.interact_with_shears(player, item_stack, hand))
+    }
+    fn mob_interact_with_hand_result(
+        &self,
+        player: &Arc<Player>,
+        item_stack: &mut ItemStack,
+        hand: Hand,
+    ) -> Option<crate::entity::EntityInteractionResult> {
+        self.mob_interact_with_hand(player, item_stack, hand)
+            .map(|handled| crate::entity::EntityInteractionResult {
+                handled,
+                item_used: true,
+            })
     }
 }
 

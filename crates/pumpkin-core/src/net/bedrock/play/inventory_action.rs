@@ -457,19 +457,23 @@ impl BedrockClient {
                         let mut stack = player.inventory().held_item();
                         let item_id = stack.item.id;
                         let before = stack.clone();
-                        let native_interaction = event.target.interact_with_hand(
+                        let native_interaction = event.target.interact_with_hand_result(
                             player,
                             &mut stack,
                             pumpkin_util::Hand::Right,
                         );
-                        if !native_interaction
-                            .unwrap_or_else(|| event.target.interact(player, &mut stack))
-                        {
+                        let item_used = native_interaction
+                            .as_ref()
+                            .is_none_or(|result| result.item_used);
+                        if !native_interaction.map_or_else(
+                            || event.target.interact(player, &mut stack),
+                            |result| result.handled,
+                        ) {
                             server
                                 .item_registry
                                 .use_on_entity(&mut stack, player, event.target);
                         }
-                        if native_interaction.is_none() && !stack.are_equal(&before) {
+                        if item_used && !stack.are_equal(&before) {
                             player.increment_stat(
                                 pumpkin_data::statistic::StatisticCategory::Used,
                                 item_id as i32,

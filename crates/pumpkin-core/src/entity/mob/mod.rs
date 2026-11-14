@@ -1111,6 +1111,16 @@ impl MobEntity {
         item_stack: &mut ItemStack,
         can_be_leashed: bool,
     ) -> bool {
+        self.interact_leash(player, item_stack, can_be_leashed)
+            .unwrap_or(false)
+    }
+
+    fn interact_leash(
+        &self,
+        player: &Arc<Player>,
+        item_stack: &mut ItemStack,
+        can_be_leashed: bool,
+    ) -> Option<bool> {
         let entity = &self.living_entity.entity;
 
         let holder = entity.get_leash_holder();
@@ -1119,7 +1129,7 @@ impl MobEntity {
             .is_some_and(|holder| holder.get_entity().entity_id == player.entity_id())
         {
             if !entity.unleash() {
-                return false;
+                return Some(false);
             }
             if player.gamemode.load() != pumpkin_util::GameMode::Creative {
                 entity.spawn_at_location(ItemStack::new(1, &Item::LEAD));
@@ -1129,7 +1139,7 @@ impl MobEntity {
                 SoundCategory::Neutral,
                 &entity.pos.load(),
             );
-            return true;
+            return Some(true);
         }
 
         if item_stack.item == &Item::LEAD
@@ -1142,11 +1152,11 @@ impl MobEntity {
             if diff.length_squared() <= Entity::LEASH_SNAP_DISTANCE * Entity::LEASH_SNAP_DISTANCE {
                 let new_holder: Arc<dyn EntityBase> = player.clone();
                 if !entity.approve_leash_attachment(new_holder.as_ref()) {
-                    return false;
+                    return Some(false);
                 }
                 if holder.is_some() {
                     if !entity.unleash() {
-                        return false;
+                        return Some(false);
                     }
                     entity.spawn_at_location(ItemStack::new(1, &Item::LEAD));
                 }
@@ -1155,7 +1165,7 @@ impl MobEntity {
                     .get_leash_holder()
                     .is_none_or(|holder| holder.get_entity().entity_id != player.entity_id())
                 {
-                    return false;
+                    return Some(false);
                 }
                 if player.gamemode.load() != pumpkin_util::GameMode::Creative {
                     item_stack.decrement(1);
@@ -1165,11 +1175,11 @@ impl MobEntity {
                     SoundCategory::Neutral,
                     &entity.pos.load(),
                 );
-                return true;
+                return Some(true);
             }
         }
 
-        false
+        None
     }
 
     pub fn check_despawn(&self, mob: &dyn Mob) {
@@ -2582,6 +2592,19 @@ pub trait Mob: EntityBase + Send + Sync {
         None
     }
 
+    fn mob_interact_with_hand_result(
+        &self,
+        player: &Arc<Player>,
+        item_stack: &mut ItemStack,
+        hand: pumpkin_util::Hand,
+    ) -> Option<super::EntityInteractionResult> {
+        self.mob_interact_with_hand(player, item_stack, hand)
+            .map(|handled| super::EntityInteractionResult {
+                handled,
+                item_used: false,
+            })
+    }
+
     /// Fires `EntityTameEvent` for a successful taming roll. `false`: a plugin refused.
     fn approve_taming(&self, player: &Arc<Player>) -> bool {
         let mob = self.get_mob_entity();
@@ -3039,17 +3062,8 @@ impl<T: Mob + Send + 'static> EntityBase for T {
     }
 
     fn interact(&self, player: &Arc<Player>, item_stack: &mut ItemStack) -> bool {
-        if item_stack.get_item() == &Item::SHEARS
-            && self.can_shear_equipment(player)
-            && !player.get_entity().is_sneaking()
-            && self.attempt_to_shear_equipment(player, item_stack)
-        {
-            return true;
-        }
-        self.mob_interact(player, item_stack)
-            || self
-                .as_ageable()
-                .is_some_and(|ageable| ageable.ageable_interact(player, item_stack))
+        self.interact_with_hand(player, item_stack, pumpkin_util::Hand::Right)
+            .unwrap_or(false)
     }
 
     fn interact_with_hand(
@@ -3058,7 +3072,74 @@ impl<T: Mob + Send + 'static> EntityBase for T {
         item_stack: &mut ItemStack,
         hand: pumpkin_util::Hand,
     ) -> Option<bool> {
-        self.mob_interact_with_hand(player, item_stack, hand)
+        self.interact_with_hand_result(player, item_stack, hand)
+            .map(|result| result.handled)
+    }
+
+    fn interact_with_hand_result(
+        &self,
+        player: &Arc<Player>,
+        item_stack: &mut ItemStack,
+        hand: pumpkin_util::Hand,
+    ) -> Option<super::EntityInteractionResult> {
+        let entity = self.get_entity();
+        if !self.get_mob_entity().living_entity.is_alive() {
+            return Some(super::EntityInteractionResult {
+                handled: false,
+                item_used: false,
+            });
+        }
+        let named = item_stack.item == &Item::NAME_TAG
+            && entity.entity_type.saveable
+            && item_stack
+                .get_data_component::<pumpkin_data::data_component_impl::CustomNameImpl>()
+                .is_some();
+        let mut item_used = true;
+        let interacted = if named {
+            let world = entity.world.load();
+            let server = world.server.upgrade()?;
+            let target = world.get_entity_by_id(entity.entity_id)?;
+            server
+                .item_registry
+                .get_pumpkin_item(item_stack.item.id)?
+                .use_on_entity(item_stack, player, target);
+            true
+        } else {
+            if let Some(handled) = super::interact_with_shears(self, player, item_stack, hand) {
+                return Some(super::EntityInteractionResult {
+                    handled,
+                    item_used: true,
+                });
+            }
+            self.get_mob_entity()
+                .interact_leash(player, item_stack, self.can_be_leashed())
+                .unwrap_or_else(|| {
+                    self.mob_interact_with_hand_result(player, item_stack, hand)
+                        .map(|result| {
+                            item_used = result.item_used;
+                            result.handled
+                        })
+                        .unwrap_or_else(|| {
+                            self.mob_interact(player, item_stack)
+                                || self.as_ageable().is_some_and(|ageable| {
+                                    ageable.ageable_interact(player, item_stack)
+                                })
+                        })
+                })
+        };
+        if interacted {
+            entity.world.load().emit_game_event_with_context(
+                pumpkin_data::game_event::GameEvent::EntityInteract.name(),
+                entity.pos.load(),
+                &crate::world::game_event::GameEventContext {
+                    source_entity: Some(player.as_ref()),
+                },
+            );
+        }
+        Some(super::EntityInteractionResult {
+            handled: interacted,
+            item_used,
+        })
     }
 
     fn on_player_collision(&self, player: &Arc<Player>) {

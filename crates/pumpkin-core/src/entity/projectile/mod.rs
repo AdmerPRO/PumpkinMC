@@ -385,11 +385,6 @@ impl ThrownItemEntity {
             return true;
         }
 
-        // A suppressed repeat deflection must not stop movement at the same surface.
-        if self.is_deflector(other_ent) && self.owner.was_deflected_by(other_ent) {
-            return true;
-        }
-
         if other.is_spectator() {
             return true;
         }
@@ -536,5 +531,51 @@ impl ProjectileHit {
             Self::Block { face, .. } => Some(*face),
             Self::Entity { .. } => None,
         }
+    }
+}
+
+#[cfg(test)]
+mod deflection_tests {
+    use super::*;
+    use crate::entity::{
+        ai::test_support::world, mob::breeze::BreezeEntity, projectile::snowball::SnowballEntity,
+    };
+    use pumpkin_util::math::vector2::Vector2;
+    use pumpkin_world::chunk::ChunkData;
+
+    #[tokio::test]
+    async fn repeat_deflection_stops_at_the_hit_without_deflecting_again()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let folder = tempfile::tempdir()?;
+        let world = world(&folder);
+        world
+            .level
+            .loaded_chunks
+            .insert(Vector2::new(0, 0), ChunkData::empty_sync(0, 0));
+        let breeze = BreezeEntity::new(Entity::new(
+            world.clone(),
+            Vector3::new(4.5, 64.0, 0.5),
+            &EntityType::BREEZE,
+        ));
+        world.spawn_entity(breeze);
+        let snowball = SnowballEntity::new(Entity::new(
+            world.clone(),
+            Vector3::new(8.5, 65.5, 0.5),
+            &EntityType::SNOWBALL,
+        ));
+        let entity = snowball.get_entity();
+        entity.tick_count.store(8, Ordering::Relaxed);
+        entity.set_velocity(Vector3::new(-6.0, 0.0, 0.0));
+        snowball.thrown.process_tick(&snowball);
+        let hit = entity.pos.load();
+        assert!(entity.velocity.load().x > 2.9);
+        entity.set_pos(Vector3::new(8.5, 65.5, 0.5));
+        entity.set_velocity(Vector3::new(-6.0, 0.0, 0.0));
+        snowball.thrown.process_tick(&snowball);
+        assert_eq!(entity.pos.load(), hit);
+        assert!(entity.velocity.load().x < -5.9);
+        assert!(!entity.is_removed());
+        world.level.shutdown().await;
+        Ok(())
     }
 }
