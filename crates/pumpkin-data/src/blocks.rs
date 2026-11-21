@@ -184,8 +184,12 @@ impl Block {
     }
 
     #[must_use]
-    pub const fn is_waterlogged(&self, id: BlockStateId) -> bool {
-        id.is_waterlogged()
+    pub fn is_waterlogged(&self, id: BlockStateId) -> bool {
+        self.properties(id).is_some_and(|properties| {
+            properties
+                .to_props()
+                .contains(&crate::Property::Waterlogged(true))
+        })
     }
 
     #[must_use]
