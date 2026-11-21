@@ -163,6 +163,21 @@ impl PluginHostState {
         }
     }
 
+    /// Returns the server and live plugin instance backing this host state.
+    pub fn server_and_plugin(&self) -> wasmtime::Result<(Arc<Server>, Arc<WasmPlugin>)> {
+        let server = Arc::clone(
+            self.server
+                .as_ref()
+                .ok_or_else(|| wasmtime::Error::msg("Server not available"))?,
+        );
+        let plugin = self
+            .plugin
+            .as_ref()
+            .and_then(Weak::upgrade)
+            .ok_or_else(|| wasmtime::Error::msg("Plugin instance not available"))?;
+        Ok((server, plugin))
+    }
+
     /// get a **borrowed** (or **owned**) [`Resource`]'s value from the resource table
     pub fn get<T: FromResource>(&self, res: &Resource<T>) -> wasmtime::Result<&T::Internal> {
         Ok(self.resource_table.get(&Resource::new_borrow(res.rep()))?)

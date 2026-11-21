@@ -248,10 +248,6 @@ impl AnvilScreenHandler {
         false
     }
 
-    pub fn update_item_name(&mut self, name: &str) {
-        self.set_item_name(name, false);
-    }
-
     pub fn update_result_slot(&mut self) {
         self.create_result(false);
     }

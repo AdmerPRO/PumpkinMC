@@ -83,21 +83,6 @@ impl Xoroshiro {
         (l, m)
     }
 
-    /// Creates a new Xoroshiro generator without mixing the seed.
-    ///
-    /// This is used for testing and when the seed is already properly mixed.
-    ///
-    /// # Arguments
-    /// - `seed` – The seed value (will be mixed using the standard mix function).
-    ///
-    /// # Returns
-    /// A new `Xoroshiro` instance.
-    #[must_use]
-    pub const fn from_seed_unmixed(seed: u64) -> Self {
-        let (lo, hi) = Self::mix_u64(seed);
-        Self::new(lo, hi)
-    }
-
     /// Generates a random value with the specified number of bits.
     ///
     /// # Arguments

@@ -220,12 +220,6 @@ impl Nbt {
 
         bytes.into()
     }
-
-    /// Writes this document without the root compound's name.
-    pub fn write_unnamed_to_writer<W: Write>(self, mut writer: W) -> Result<(), io::Error> {
-        writer.write_all(&self.write_unnamed())?;
-        Ok(())
-    }
 }
 
 impl Deref for Nbt {

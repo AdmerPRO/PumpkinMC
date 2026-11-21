@@ -322,9 +322,4 @@ impl PortalProcessor {
     pub const fn decay_tick(&mut self) {
         self.portal_time = self.portal_time.saturating_sub(4);
     }
-
-    #[must_use]
-    pub const fn has_expired(&self) -> bool {
-        self.portal_time == 0
-    }
 }

@@ -489,11 +489,7 @@ impl pumpkin_inventory::Inventory for BrewingStandBlockEntity {
     }
 
     fn set_stack(&self, slot: usize, stack: ItemStack) {
-        let mut items = self
-            .items
-            .write()
-            .unwrap_or_else(std::sync::PoisonError::into_inner);
-        items[slot] = stack;
+        pumpkin_inventory::set_locked_stack(&self.items, slot, stack);
         self.mark_dirty();
     }
 

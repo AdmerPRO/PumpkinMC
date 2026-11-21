@@ -162,15 +162,6 @@ impl Color {
         let b = u8::from_str_radix(&hex[4..6], 16).ok()?;
         Some(Self::Rgb(RGBColor::new(r, g, b)))
     }
-
-    /// Downsamples custom RGB colors to the nearest named Minecraft color.
-    #[must_use]
-    pub fn downsample(&self) -> Self {
-        match self {
-            Self::Rgb(rgb) => Self::Named(rgb.to_nearest_named()),
-            other => *other,
-        }
-    }
 }
 
 /// An RGB color with red, green, and blue components.
@@ -289,32 +280,6 @@ impl ARGBColor {
             | (self.red as u32) << 16
             | (self.green as u32) << 8
             | (self.blue as u32)) as i32
-    }
-
-    /// Converts this ARGB color to a 32-bit unsigned integer.
-    #[must_use]
-    pub const fn to_argb_u32(&self) -> u32 {
-        (self.alpha as u32) << 24
-            | (self.red as u32) << 16
-            | (self.green as u32) << 8
-            | (self.blue as u32)
-    }
-
-    /// Constructs an `ARGBColor` from a 32-bit unsigned integer.
-    #[must_use]
-    pub const fn from_argb_u32(val: u32) -> Self {
-        Self {
-            alpha: (val >> 24) as u8,
-            red: (val >> 16) as u8,
-            green: (val >> 8) as u8,
-            blue: val as u8,
-        }
-    }
-
-    /// Constructs an `ARGBColor` from a 32-bit signed integer.
-    #[must_use]
-    pub const fn from_argb_int(val: i32) -> Self {
-        Self::from_argb_u32(val as u32)
     }
 }
 

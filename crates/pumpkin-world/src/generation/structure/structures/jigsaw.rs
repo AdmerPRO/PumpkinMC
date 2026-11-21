@@ -23,16 +23,6 @@ pub enum JigsawProjection {
 static DYNAMIC_POOLS: std::sync::LazyLock<dashmap::DashMap<String, Arc<TemplatePool>>> =
     std::sync::LazyLock::new(dashmap::DashMap::new);
 
-/// Registers a dynamically-loaded template pool from a runtime datapack.
-pub fn register_dynamic_template_pool(id: &str, pool: Arc<TemplatePool>) {
-    let key = if id.contains(':') {
-        id.to_string()
-    } else {
-        format!("minecraft:{id}")
-    };
-    DYNAMIC_POOLS.insert(key, pool);
-}
-
 /// Registers a dynamically-loaded template pool from raw JSON string (e.g. from an on-disk datapack).
 pub fn register_dynamic_template_pool_json(
     id: &str,
@@ -929,17 +919,6 @@ pub struct JigsawGenerator {
 impl JigsawGenerator {
     #[must_use]
     pub fn new(start_pool: &str, size: i32) -> Self {
-        Self {
-            start_pool: start_pool.to_string(),
-            size,
-            start_jigsaw_name: None,
-            use_expansion_hack: false,
-            pool_aliases: &[],
-        }
-    }
-
-    #[must_use]
-    pub fn new_with_pool(start_pool: &str, size: i32) -> Self {
         Self {
             start_pool: start_pool.to_string(),
             size,

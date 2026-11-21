@@ -24,12 +24,6 @@ pub fn parse_condition_with_predicates(
     Parser { predicates }.condition(value, 0)
 }
 
-/// Parses a condition without predicate resolution.
-#[must_use]
-pub fn parse_condition(value: &Value) -> Option<Condition> {
-    parse_condition_with_predicates(value, &|_| None)
-}
-
 /// Parses a loot table with a resolver for named predicate definitions.
 pub fn parse_loot_table_with_predicates(
     json: &str,

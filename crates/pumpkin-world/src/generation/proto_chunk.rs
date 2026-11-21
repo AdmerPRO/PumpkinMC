@@ -477,10 +477,6 @@ impl ProtoChunk {
         self.pending_block_entities.push(nbt);
     }
 
-    pub fn take_pending_block_entities(&mut self) -> Vec<NbtCompound> {
-        std::mem::take(&mut self.pending_block_entities)
-    }
-
     pub fn add_structure_entity(&mut self, nbt: NbtCompound) {
         self.pending_structure_entities.push(nbt);
     }

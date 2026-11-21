@@ -23,7 +23,6 @@
 //! - [`brewing`] - Brewing stand handling
 //! - [`slot`] - Slot trait and implementations (normal slots, armor slots)
 //! - [`container_click`] - Mouse and keyboard click handling
-//! - [`drag_handler`] - Item dragging across multiple slots
 //! - [`sync_handler`] - Client-server inventory synchronization
 //! - [`window_property`] - Container UI properties (furnace progress, enchantment levels, etc.)
 //!
@@ -41,14 +40,12 @@ pub mod container_click;
 pub mod crafter_screen_handler;
 pub mod crafting;
 pub mod double;
-pub mod drag_handler;
 pub mod enchanting;
 pub mod entity_equipment;
 mod error;
 pub mod furnace_like;
 pub mod generic_container_screen_handler;
 pub mod grindstone_screen_handler;
-pub mod gui_builder;
 pub mod inventory;
 pub mod lectern_screen_handler;
 pub mod loom_screen_handler;
@@ -67,8 +64,9 @@ use rustc_hash::FxHashMap;
 
 pub use error::InventoryError;
 pub use inventory::{
-    Clearable, ComparableInventory, Inventory, SimpleInventory, split_stack_slice,
-    sync_read_items_from_nbt, sync_write_items_to_nbt, update_locked_stack,
+    Clearable, ComparableInventory, Inventory, SimpleInventory, set_locked_stack,
+    split_locked_stack, split_stack_slice, sync_read_items_from_nbt, sync_write_items_to_nbt,
+    update_locked_stack,
 };
 use pumpkin_data::data_component_impl::EquipmentSlot;
 pub use viewer::ViewerCountTracker;

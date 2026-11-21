@@ -160,10 +160,6 @@ pub struct LootTable {
     pub functions: &'static [LootFunction],
 }
 
-pub type ChestLootEntry = LootEntry;
-pub type ChestLootPool = LootPool;
-pub type ChestLootTable = LootTable;
-
 #[derive(Clone, Debug, PartialEq, Default)]
 pub enum DynamicLootCondition {
     #[default]

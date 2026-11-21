@@ -56,14 +56,6 @@ impl PlayerScreenHandler {
         EquipmentSlot::FEET,
     ];
 
-    /// Checks if a slot index is in the hotbar.
-    ///
-    /// Hotbar slots are 36-44 in the protocol (0-indexed 36-44).
-    #[must_use]
-    pub fn is_in_hotbar(slot: u8) -> bool {
-        (36..=45).contains(&slot)
-    }
-
     /// Gets a slot by its index.
     pub fn get_slot(&self, slot: usize) -> Arc<dyn Slot> {
         self.behaviour.slots[slot].clone()

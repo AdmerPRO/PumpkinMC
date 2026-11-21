@@ -223,14 +223,6 @@ impl<R> DataResult<R> {
         }
     }
 
-    /// Tries to get a complete or partial result as a reference. If no such result exists, this returns [`None`].
-    pub const fn result_or_partial_as_ref(&self) -> Option<&R> {
-        match self {
-            Self::Success { result, .. } => Some(result),
-            Self::Error { partial_result, .. } => partial_result.as_ref(),
-        }
-    }
-
     /// Tries to get a complete result from this `DataResult`. If no such result exists, this function panics.
     #[allow(clippy::unwrap_used, clippy::expect_used)]
     pub fn unwrap(self) -> R {
@@ -447,36 +439,6 @@ impl<R> DataResult<R> {
                 lifecycle,
                 partial_result,
             } => Self::new_option_error_with_lifecycle(f(message), partial_result, lifecycle),
-        }
-    }
-
-    /// Promotes a `DataResult` containing a partial result to a success `DataResult`, providing
-    /// the error message to a function `f` (consumer function) and removing it from the new `DataResult`.
-    /// `DataResult`s with no result or a complete result are left untouched.
-    pub fn promote_partial(self, f: impl FnOnce(String)) -> Self {
-        match self {
-            Self::Success { .. } => self,
-            Self::Error {
-                message,
-                lifecycle,
-                partial_result,
-            } => {
-                f(message.clone());
-                partial_result.map_or_else(
-                    || Self::new_error_with_lifecycle(message, lifecycle),
-                    |result| Self::new_success_with_lifecycle(result, lifecycle),
-                )
-            }
-        }
-    }
-
-    /// Returns a `DataResult` with a new partial value (always partial), leaving `DataResult`s with a complete result untouched.
-    pub fn with_partial(self, partial_value: R) -> Self {
-        match self {
-            Self::Success { .. } => self,
-            Self::Error {
-                message, lifecycle, ..
-            } => Self::new_partial_error_with_lifecycle(message, partial_value, lifecycle),
         }
     }
 

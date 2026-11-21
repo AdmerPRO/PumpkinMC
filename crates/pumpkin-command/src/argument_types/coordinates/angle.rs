@@ -1,11 +1,9 @@
 use pumpkin_data::translation;
-use pumpkin_util::math::wrap_degrees;
 
 use crate::argument_types::argument_type::{ArgumentType, JavaClientArgumentType};
 use crate::context::command_context::CommandContext;
 use crate::errors::command_syntax_error::CommandSyntaxError;
 use crate::errors::error_types::CommandErrorType;
-use crate::source::CommandSource;
 use crate::string_reader::StringReader;
 
 pub const ERROR_NOT_COMPLETE: CommandErrorType<0> = CommandErrorType::new(
@@ -28,16 +26,6 @@ impl Angle {
     #[must_use]
     pub const fn new(angle: f32, is_relative: bool) -> Self {
         Self { angle, is_relative }
-    }
-
-    #[must_use]
-    pub fn get_angle(&self, source: &impl CommandSource) -> f32 {
-        let base = if self.is_relative {
-            source.rotation().y
-        } else {
-            0.0
-        };
-        wrap_degrees(base + self.angle)
     }
 }
 

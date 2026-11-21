@@ -976,19 +976,6 @@ mod test {
         },
     });
 
-    // #[test]
-    // fn deserialize_level_dat() {
-    //     let raw_compressed_nbt = fs::read("assets/level_1_21_4.dat").unwrap();
-    //     assert!(!raw_compressed_nbt.is_empty());
-
-    //     let mut decoder = GzDecoder::new(&raw_compressed_nbt[..]);
-    //     let mut buf = Vec::new();
-    //     decoder.read_to_end(&mut buf).unwrap();
-    //     let level_dat: LevelDat = from_bytes(Cursor::new(buf)).expect("Failed to decode from file");
-
-    //     assert_eq!(level_dat, *LEVEL_DAT);
-    // }
-
     #[test]
     fn serialize_level_dat() {
         let mut data_comp = pumpkin_nbt::compound::NbtCompound::new();

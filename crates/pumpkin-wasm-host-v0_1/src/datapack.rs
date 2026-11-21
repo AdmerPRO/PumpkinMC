@@ -83,19 +83,7 @@ impl HostDatapackManagerWithStore<PluginHostState> for HasSelf<PluginHostState> 
         name: String,
         position: WitEnablePosition,
     ) -> wasmtime::Result<Result<(), String>> {
-        let (server, plugin) = {
-            let state = host.get();
-            let server = state
-                .server
-                .clone()
-                .ok_or_else(|| wasmtime::Error::msg("Server not available"))?;
-            let plugin = state
-                .plugin
-                .as_ref()
-                .and_then(std::sync::Weak::upgrade)
-                .ok_or_else(|| wasmtime::Error::msg("Plugin instance not available"))?;
-            (server, plugin)
-        };
+        let (server, plugin) = host.get().server_and_plugin()?;
         let position = to_data_enable_position(position);
 
         plugin
@@ -111,19 +99,7 @@ impl HostDatapackManagerWithStore<PluginHostState> for HasSelf<PluginHostState> 
         _res: Resource<WitDatapackManager>,
         name: String,
     ) -> wasmtime::Result<Result<(), String>> {
-        let (server, plugin) = {
-            let state = host.get();
-            let server = state
-                .server
-                .clone()
-                .ok_or_else(|| wasmtime::Error::msg("Server not available"))?;
-            let plugin = state
-                .plugin
-                .as_ref()
-                .and_then(std::sync::Weak::upgrade)
-                .ok_or_else(|| wasmtime::Error::msg("Plugin instance not available"))?;
-            (server, plugin)
-        };
+        let (server, plugin) = host.get().server_and_plugin()?;
 
         plugin
             .store
@@ -137,19 +113,7 @@ impl HostDatapackManagerWithStore<PluginHostState> for HasSelf<PluginHostState> 
         mut host: Access<'_, PluginHostState, Self>,
         _res: Resource<WitDatapackManager>,
     ) -> wasmtime::Result<Result<(), String>> {
-        let (server, plugin) = {
-            let state = host.get();
-            let server = state
-                .server
-                .clone()
-                .ok_or_else(|| wasmtime::Error::msg("Server not available"))?;
-            let plugin = state
-                .plugin
-                .as_ref()
-                .and_then(std::sync::Weak::upgrade)
-                .ok_or_else(|| wasmtime::Error::msg("Plugin instance not available"))?;
-            (server, plugin)
-        };
+        let (server, plugin) = host.get().server_and_plugin()?;
 
         plugin
             .store
@@ -162,19 +126,7 @@ impl HostDatapackManagerWithStore<PluginHostState> for HasSelf<PluginHostState> 
         _res: Resource<WitDatapackManager>,
         name: String,
     ) -> wasmtime::Result<Result<u32, String>> {
-        let (server, plugin) = {
-            let state = host.get();
-            let server = state
-                .server
-                .clone()
-                .ok_or_else(|| wasmtime::Error::msg("Server not available"))?;
-            let plugin = state
-                .plugin
-                .as_ref()
-                .and_then(std::sync::Weak::upgrade)
-                .ok_or_else(|| wasmtime::Error::msg("Plugin instance not available"))?;
-            (server, plugin)
-        };
+        let (server, plugin) = host.get().server_and_plugin()?;
 
         plugin
             .store

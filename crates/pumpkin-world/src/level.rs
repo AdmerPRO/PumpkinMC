@@ -501,12 +501,6 @@ impl Level {
         chunks_to_clean
     }
 
-    /// Returns whether the chunk should be removed from memory
-    #[inline]
-    pub fn mark_chunk_as_not_watched(&self, chunk: Vector2<i32>) -> bool {
-        !self.mark_chunks_as_not_watched([chunk]).is_empty()
-    }
-
     // In Level::clean_entity_chunks()
     pub fn clean_entity_chunks(
         self: &Arc<Self>,
@@ -630,10 +624,6 @@ impl Level {
         ticks.fluid_ticks.sort_unstable();
 
         ticks
-    }
-
-    pub fn clean_entity_chunk(self: &Arc<Self>, chunk: &Vector2<i32>) {
-        self.clean_entity_chunks([*chunk]);
     }
 
     pub fn is_chunk_watched(&self, chunk: &Vector2<i32>) -> bool {
@@ -977,25 +967,6 @@ impl Level {
             .filter(|entry| entry.value().live.load(Ordering::Relaxed))
             .map(|entry| *entry.key())
             .collect()
-    }
-
-    pub async fn get_or_fetch_entity_chunk<R, F: Fn(&SyncEntityChunk) -> R>(
-        self: &Arc<Self>,
-        pos: Vector2<i32>,
-        f: F,
-    ) -> R {
-        if let Some(res) = self.read_entity_chunk_sync(&pos, &f) {
-            return res;
-        }
-        let chunk = self.get_entity_chunk(pos).await;
-        f(&chunk)
-    }
-
-    pub fn try_get_entity_chunk(
-        &self,
-        coordinates: Vector2<i32>,
-    ) -> Option<dashmap::mapref::one::Ref<'_, Vector2<i32>, Arc<ChunkEntityData>>> {
-        self.loaded_entity_chunks.try_get(&coordinates).try_unwrap()
     }
 
     /// Reserves tick orders for `entities` entities; entity `i` starts at

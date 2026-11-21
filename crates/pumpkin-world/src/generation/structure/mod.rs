@@ -4,7 +4,6 @@ use pumpkin_data::{
 };
 
 use crate::{
-    ProtoChunk,
     biome::BiomeSupplier,
     generation::{
         biome_coords,
@@ -12,7 +11,6 @@ use crate::{
         structure::structures::{
             StructureGenerator, StructureGeneratorContext, StructurePosition,
             buried_treasure::BuriedTreasureGenerator,
-            create_chunk_random,
             desert_pyramid::DesertPyramidGenerator,
             end_city::EndCityGenerator,
             igloo::IglooGenerator,
@@ -182,50 +180,6 @@ fn generate_structure_position_checked(
                 .filter(|pos| is_valid_biome(pos.start_pos))
         }
     }
-}
-
-#[must_use]
-pub fn try_generate_structure(
-    key: &StructureKeys,
-    structure: &Structure,
-    seed: i64,
-    chunk: &ProtoChunk,
-    sea_level: i32,
-    height_sampler: Option<&mut dyn crate::generation::structure::structures::HeightSampler>,
-) -> Option<StructurePosition> {
-    let biomes = get_tag_ids(
-        RegistryKey::WorldgenBiome,
-        structure
-            .biomes
-            .strip_prefix('#')
-            .unwrap_or(structure.biomes),
-    )?;
-    let random = create_chunk_random(seed, chunk.x, chunk.z);
-    let context = StructureGeneratorContext {
-        seed,
-        chunk_x: chunk.x,
-        chunk_z: chunk.z,
-        random,
-        sea_level,
-        min_y: (chunk.generation_bottom_y() as i32).max(chunk.bottom_y() as i32),
-        height: chunk.generation_height().min(chunk.height()),
-        height_sampler,
-        structure_key: Some(*key),
-    };
-    generate_structure_position_checked(*key, structure, context, |start_pos| {
-        let biome_y = biome_coords::from_block(start_pos.0.y);
-        let biome_height = (chunk.height() >> 2) as i32;
-        let biome_bottom = biome_coords::from_block(chunk.bottom_y() as i32);
-        let clamped_biome_y = biome_y.clamp(biome_bottom, biome_bottom + biome_height - 1);
-
-        let current_biome = chunk.get_biome_id(
-            biome_coords::from_block(start_pos.0.x),
-            clamped_biome_y,
-            biome_coords::from_block(start_pos.0.z),
-        ) as u16;
-
-        biomes.contains(&current_biome)
-    })
 }
 
 #[must_use]

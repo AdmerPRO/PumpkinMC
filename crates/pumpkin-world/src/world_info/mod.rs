@@ -576,15 +576,6 @@ impl LevelData {
     }
 
     #[must_use]
-    pub fn default_with_preset(seed: Seed, preset_name: &str) -> Self {
-        let mut data = Self::default(seed);
-        if let Some(wgs) = WorldGenSettings::from_preset_name(preset_name, seed) {
-            data.world_gen_settings = wgs;
-        }
-        data
-    }
-
-    #[must_use]
     pub fn from_world_generator(
         seed: Seed,
         generator: &crate::generation::generator::VanillaGenerator,

@@ -160,14 +160,6 @@ impl BinaryHeap {
         nodes
     }
 
-    #[must_use]
-    pub fn get_heap(&self) -> Vec<Node> {
-        self.heap[1..=self.size]
-            .iter()
-            .filter_map(|node_opt| *node_opt)
-            .collect()
-    }
-
     fn bubble_up(&mut self, mut index: usize) {
         while index > 1 {
             let parent_index = index / 2;

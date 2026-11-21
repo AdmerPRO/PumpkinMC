@@ -519,15 +519,6 @@ impl Palette {
         &self.blocks
     }
 
-    #[must_use]
-    pub fn blocks_by_name(&self, filter: &str) -> Vec<StructureBlockInfo> {
-        self.blocks
-            .iter()
-            .filter(|b| b.state.name == filter)
-            .cloned()
-            .collect()
-    }
-
     pub fn jigsaws(&mut self) -> &[JigsawBlockInfo] {
         self.cached_jigsaws.get_or_insert_with(|| {
             self.blocks
@@ -631,10 +622,6 @@ impl StructureTemplate {
     #[must_use]
     pub fn palettes(&self) -> &[Palette] {
         &self.palettes
-    }
-
-    pub const fn palettes_mut(&mut self) -> &mut Vec<Palette> {
-        &mut self.palettes
     }
 
     /// Returns the template's jigsaw blocks in template-local coordinates.

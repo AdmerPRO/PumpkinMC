@@ -181,13 +181,6 @@ impl Suggestion {
         self.text.cached_text()
     }
 
-    /// Gets the internal [`SuggestionText`] that represents the text of this suggestion,
-    /// but as a `&str` taken directly from the cache without any cloning.
-    #[must_use]
-    pub const fn text_as_str(&self) -> &str {
-        self.text.cached_text().as_str()
-    }
-
     /// Applies this [`Suggestion`] into a string,
     /// returning a new [`String`] with the applied suggestion.
     #[must_use]

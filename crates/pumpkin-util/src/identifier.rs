@@ -195,51 +195,6 @@ impl Identifier {
         Self::new(PUMPKIN_NAMESPACE, path)
     }
 
-    /// Creates a new [`Identifier`] that has a namespace of `pumpkin` at compile-time.
-    ///
-    /// # Panics
-    ///
-    /// Panics if the provided path is invalid.
-    #[must_use]
-    pub const fn pumpkin_static(path: &'static str) -> Self {
-        Self::from_static(PUMPKIN_NAMESPACE, path)
-    }
-
-    /// Consumes this identifier to replace its current path with the specified path.
-    pub fn with_path(self, path: impl Into<Cow<'static, str>>) -> IdentifierCreationResult {
-        Self::validate_identifier_path(Self {
-            namespace: self.namespace,
-            path: path.into(),
-        })
-    }
-
-    /// Consumes this identifier to add a prefix to the current path.
-    pub fn prefix_path(self, prefix: &str) -> IdentifierCreationResult {
-        Self::validate_identifier_path(Self {
-            namespace: self.namespace,
-            path: format!("{prefix}{}", self.path).into(),
-        })
-    }
-
-    /// Consumes this identifier to add a suffix to the current path.
-    pub fn suffix_path(self, suffix: &str) -> IdentifierCreationResult {
-        Self::validate_identifier_path(Self {
-            namespace: self.namespace,
-            path: format!("{}{suffix}", self.path).into(),
-        })
-    }
-
-    /// Consumes this identifier to create a new one by mapping its path through the given function.
-    pub fn map_path<F>(self, f: F) -> IdentifierCreationResult
-    where
-        F: FnOnce(&str) -> String,
-    {
-        Self::validate_identifier_path(Self {
-            namespace: self.namespace,
-            path: f(&self.path).into(),
-        })
-    }
-
     /// Gets the namespace of this [`Identifier`].
     #[must_use]
     #[inline]
@@ -258,13 +213,6 @@ impl Identifier {
         if !Self::is_valid_namespace(&identifier.namespace) {
             return Err(IdentifierError::InvalidNamespace(identifier));
         }
-        if !Self::is_valid_path(&identifier.path) {
-            return Err(IdentifierError::InvalidPath(identifier));
-        }
-        Ok(identifier)
-    }
-
-    fn validate_identifier_path(identifier: Self) -> IdentifierCreationResult {
         if !Self::is_valid_path(&identifier.path) {
             return Err(IdentifierError::InvalidPath(identifier));
         }
@@ -323,28 +271,6 @@ impl Identifier {
     #[must_use]
     pub fn is_vanilla(&self) -> bool {
         self.namespace() == VANILLA_NAMESPACE
-    }
-
-    /// Returns whether this identifier is a `pumpkin:` prefixed one.
-    #[must_use]
-    pub fn is_pumpkin(&self) -> bool {
-        self.namespace() == PUMPKIN_NAMESPACE
-    }
-
-    /// If this identifier is a `minecraft:` prefixed one, it returns
-    /// a [`Some`] containing the path of this identifier. Otherwise,
-    /// a [`None`] is returned.
-    #[must_use]
-    pub fn is_vanilla_then(&self) -> Option<&str> {
-        self.is_vanilla().then_some(&self.path)
-    }
-
-    /// If this identifier is a `pumpkin:` prefixed one, it returns
-    /// a [`Some`] containing the path of this identifier. Otherwise,
-    /// a [`None`] is returned.
-    #[must_use]
-    pub fn is_pumpkin_then(&self) -> Option<&str> {
-        self.is_pumpkin().then_some(&self.path)
     }
 }
 

@@ -405,7 +405,6 @@ impl LinearV2File {
         // the per-chunk size field inside each bucket.
         let mut bitmap_raw = [0u8; ChunkBitmap::SIZE];
         bitmap_raw.copy_from_slice(&buf.split_to(ChunkBitmap::SIZE));
-        //let _bitmap = ChunkBitmap(bitmap_raw);
 
         let _features = NbtFeatures::from_bytes(&mut buf)?;
 

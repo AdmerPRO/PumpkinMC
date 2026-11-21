@@ -12,12 +12,6 @@ use tracing::warn;
 use crate::world_info::{WorldGenSettings, WorldInfoError};
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, Debug)]
-pub struct DataFileRoot<T> {
-    #[serde(rename = "data")]
-    pub data: T,
-}
-
-#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, Debug)]
 pub struct WeatherData {
     #[serde(rename = "rain_time", default)]
     pub rain_time: i32,

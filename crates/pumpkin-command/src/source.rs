@@ -55,14 +55,6 @@ impl ReturnValue {
             Self::Failure => false,
         }
     }
-
-    #[must_use]
-    pub const fn result_value(self) -> i32 {
-        match self {
-            Self::Success(value) => value,
-            Self::Failure => 0,
-        }
-    }
 }
 
 /// Abstract command source trait for command dispatch and execution.

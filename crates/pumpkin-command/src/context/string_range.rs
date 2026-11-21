@@ -1,7 +1,5 @@
 use std::ops::Range;
 
-use crate::string_reader::StringReader;
-
 /// Indicates a range that is effectively
 /// a substring of a string from its `start`
 /// and `end` byte-indices.
@@ -32,13 +30,6 @@ impl StringRange {
     #[must_use]
     pub fn encompass(a: Self, b: Self) -> Self {
         Self::between(a.start.min(b.start), a.end.max(b.end))
-    }
-
-    /// Gets a [`str`] substring slice bound
-    /// to a [`StringReader`] from this range.
-    #[must_use]
-    pub fn slice_from_reader<'a>(&self, reader: &'a StringReader) -> &'a str {
-        &reader.string()[self.start..self.end]
     }
 
     /// Gets a [`str`] substring slice bound

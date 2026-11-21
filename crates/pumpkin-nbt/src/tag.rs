@@ -203,11 +203,6 @@ impl NbtTag {
         Self::deserialize_data(reader, tag_id)
     }
 
-    /// Advances a reader past the payload belonging to `tag_id`.
-    pub fn skip_data<'a, R: NbtReadHelper<'a>>(reader: &mut R, tag_id: u8) -> Result<(), Error> {
-        Self::skip_data_depth(reader, tag_id, 0)
-    }
-
     /// Advances a reader past the payload belonging to `tag_id` with depth tracking.
     pub fn skip_data_depth<'a, R: NbtReadHelper<'a>>(
         reader: &mut R,

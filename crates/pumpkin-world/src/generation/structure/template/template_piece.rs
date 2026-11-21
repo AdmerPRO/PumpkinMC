@@ -91,21 +91,6 @@ impl TemplatePiece {
         }
     }
 
-    /// Creates a template piece with a specific chain length.
-    #[must_use]
-    pub fn with_chain_length(
-        template: Arc<StructureTemplate>,
-        rotation: Rotation,
-        mirror: Mirror,
-        origin: Vector3<i32>,
-        piece_type: StructurePieceType,
-        chain_length: u32,
-    ) -> Self {
-        let mut piece = Self::new(template, rotation, mirror, origin, piece_type);
-        piece.piece.chain_length = chain_length;
-        piece
-    }
-
     /// Returns the template's size after applying rotation.
     #[must_use]
     pub fn rotated_size(&self) -> Vector3<i32> {
@@ -136,11 +121,6 @@ impl TemplatePiece {
     #[must_use]
     pub const fn place_settings(&self) -> &StructurePlaceSettings {
         &self.place_settings
-    }
-
-    /// Gets a mutable reference to the structure placement settings.
-    pub const fn place_settings_mut(&mut self) -> &mut StructurePlaceSettings {
-        &mut self.place_settings
     }
 
     /// Transforms a template-relative position to world coordinates.

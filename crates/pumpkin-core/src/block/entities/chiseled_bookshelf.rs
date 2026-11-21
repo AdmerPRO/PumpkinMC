@@ -241,26 +241,14 @@ impl ChiseledBookshelfBlockEntity {
     }
 
     pub fn set_book(&self, slot: usize, stack: ItemStack) {
-        let mut items = self
-            .items
-            .write()
-            .unwrap_or_else(std::sync::PoisonError::into_inner);
-        items[slot] = stack;
+        pumpkin_inventory::set_locked_stack(&self.items, slot, stack);
         self.mark_dirty();
     }
 
     pub fn remove_book(&self, slot: usize, amount: u8) -> ItemStack {
-        let mut items = self
-            .items
-            .write()
-            .unwrap_or_else(std::sync::PoisonError::into_inner);
-        let res = if !items[slot].is_empty() && amount > 0 {
-            items[slot].split(amount)
-        } else {
-            ItemStack::EMPTY.clone()
-        };
+        let stack = pumpkin_inventory::split_locked_stack(&self.items, slot, amount);
         self.mark_dirty();
-        res
+        stack
     }
 }
 

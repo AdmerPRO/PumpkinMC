@@ -139,35 +139,6 @@ impl PoolAliasLookup {
         self.aliases.insert(alias, target);
     }
 
-    pub fn add_random(
-        &mut self,
-        alias: String,
-        targets: &[(String, u32)],
-        random: &mut RandomGenerator,
-    ) {
-        if targets.is_empty() {
-            return;
-        }
-        let total_weight: u32 = targets.iter().map(|(_, w)| *w).sum();
-        if total_weight == 0 {
-            if let Some((target, _)) = targets.first() {
-                self.add_direct(alias, target.clone());
-            }
-            return;
-        }
-        let mut r = random.next_bounded_i32(total_weight as i32) as u32;
-        for (target, weight) in targets {
-            if r < *weight {
-                self.add_direct(alias, target.clone());
-                return;
-            }
-            r -= *weight;
-        }
-        if let Some((target, _)) = targets.first() {
-            self.add_direct(alias, target.clone());
-        }
-    }
-
     #[must_use]
     pub fn lookup<'a>(&'a self, mut id: &'a str, _random: &mut RandomGenerator) -> &'a str {
         while let Some(target) = self.aliases.get(id) {

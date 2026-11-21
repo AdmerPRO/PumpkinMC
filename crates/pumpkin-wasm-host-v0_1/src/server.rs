@@ -573,19 +573,7 @@ impl pumpkin::plugin::server::HostServerWithStore<PluginHostState> for HasSelf<P
         name: String,
         dimension: Dimension,
     ) -> wasmtime::Result<Resource<pumpkin::plugin::world::World>> {
-        let (server, plugin) = {
-            let state = host.get();
-            let server = state
-                .server
-                .clone()
-                .ok_or_else(|| wasmtime::Error::msg("Server not available"))?;
-            let plugin = state
-                .plugin
-                .as_ref()
-                .and_then(std::sync::Weak::upgrade)
-                .ok_or_else(|| wasmtime::Error::msg("Plugin instance not available"))?;
-            (server, plugin)
-        };
+        let (server, plugin) = host.get().server_and_plugin()?;
 
         let internal_dim = match dimension {
             Dimension::Overworld => pumpkin_data::dimension::Dimension::OVERWORLD,
@@ -607,19 +595,7 @@ impl pumpkin::plugin::server::HostServerWithStore<PluginHostState> for HasSelf<P
         _rep: Resource<Server>,
         name: String,
     ) -> wasmtime::Result<Result<(), String>> {
-        let (server, plugin) = {
-            let state = host.get();
-            let server = state
-                .server
-                .clone()
-                .ok_or_else(|| wasmtime::Error::msg("Server not available"))?;
-            let plugin = state
-                .plugin
-                .as_ref()
-                .and_then(std::sync::Weak::upgrade)
-                .ok_or_else(|| wasmtime::Error::msg("Plugin instance not available"))?;
-            (server, plugin)
-        };
+        let (server, plugin) = host.get().server_and_plugin()?;
 
         plugin
             .store
@@ -631,19 +607,7 @@ impl pumpkin::plugin::server::HostServerWithStore<PluginHostState> for HasSelf<P
         mut host: Access<'_, PluginHostState, Self>,
         _rep: Resource<Server>,
     ) -> wasmtime::Result<Result<(), String>> {
-        let (server, plugin) = {
-            let state = host.get();
-            let server = state
-                .server
-                .clone()
-                .ok_or_else(|| wasmtime::Error::msg("Server not available"))?;
-            let plugin = state
-                .plugin
-                .as_ref()
-                .and_then(std::sync::Weak::upgrade)
-                .ok_or_else(|| wasmtime::Error::msg("Plugin instance not available"))?;
-            (server, plugin)
-        };
+        let (server, plugin) = host.get().server_and_plugin()?;
 
         plugin
             .store
@@ -656,19 +620,7 @@ impl pumpkin::plugin::server::HostServerWithStore<PluginHostState> for HasSelf<P
         _rep: Resource<Server>,
         message: String,
     ) -> wasmtime::Result<()> {
-        let (server, plugin) = {
-            let state = host.get();
-            let server = state
-                .server
-                .clone()
-                .ok_or_else(|| wasmtime::Error::msg("Server not available"))?;
-            let plugin = state
-                .plugin
-                .as_ref()
-                .and_then(std::sync::Weak::upgrade)
-                .ok_or_else(|| wasmtime::Error::msg("Plugin instance not available"))?;
-            (server, plugin)
-        };
+        let (server, plugin) = host.get().server_and_plugin()?;
         let message = TextComponent::text(message);
         let sender = TextComponent::text("Server");
 
@@ -812,19 +764,7 @@ impl pumpkin::plugin::server::HostOpManagerWithStore<PluginHostState> for HasSel
         level: pumpkin::plugin::permission::PermissionLevel,
         bypasses_player_limit: bool,
     ) -> wasmtime::Result<()> {
-        let (server, plugin) = {
-            let state = host.get();
-            let server = state
-                .server
-                .clone()
-                .ok_or_else(|| wasmtime::Error::msg("Server not available"))?;
-            let plugin = state
-                .plugin
-                .as_ref()
-                .and_then(std::sync::Weak::upgrade)
-                .ok_or_else(|| wasmtime::Error::msg("Plugin instance not available"))?;
-            (server, plugin)
-        };
+        let (server, plugin) = host.get().server_and_plugin()?;
         let uuid = WitUuid::from_wit(&id);
         let internal_level = from_wit_permission_level(level);
 
@@ -865,19 +805,7 @@ impl pumpkin::plugin::server::HostOpManagerWithStore<PluginHostState> for HasSel
         _res: Resource<WitOpManager>,
         id: WitUuid,
     ) -> wasmtime::Result<bool> {
-        let (server, plugin) = {
-            let state = host.get();
-            let server = state
-                .server
-                .clone()
-                .ok_or_else(|| wasmtime::Error::msg("Server not available"))?;
-            let plugin = state
-                .plugin
-                .as_ref()
-                .and_then(std::sync::Weak::upgrade)
-                .ok_or_else(|| wasmtime::Error::msg("Plugin instance not available"))?;
-            (server, plugin)
-        };
+        let (server, plugin) = host.get().server_and_plugin()?;
         let uuid = WitUuid::from_wit(&id);
 
         plugin
@@ -1389,19 +1317,7 @@ impl pumpkin::plugin::server::HostWhitelistManagerWithStore<PluginHostState>
         _res: Resource<WitWhitelistManager>,
         enabled: bool,
     ) -> wasmtime::Result<()> {
-        let (server, plugin) = {
-            let state = host.get();
-            let server = state
-                .server
-                .clone()
-                .ok_or_else(|| wasmtime::Error::msg("Server not available"))?;
-            let plugin = state
-                .plugin
-                .as_ref()
-                .and_then(std::sync::Weak::upgrade)
-                .ok_or_else(|| wasmtime::Error::msg("Plugin instance not available"))?;
-            (server, plugin)
-        };
+        let (server, plugin) = host.get().server_and_plugin()?;
 
         plugin
             .store

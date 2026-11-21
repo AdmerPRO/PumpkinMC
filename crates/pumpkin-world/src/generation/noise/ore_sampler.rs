@@ -82,6 +82,4 @@ pub mod vein_type {
         min_y: -60,
         max_y: -8,
     };
-    pub const MIN_Y: i32 = IRON.min_y;
-    pub const MAX_Y: i32 = COPPER.max_y;
 }

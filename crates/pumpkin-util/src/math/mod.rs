@@ -2,7 +2,6 @@ use num_traits::{Float, One, PrimInt, Zero};
 use std::sync::LazyLock;
 
 pub mod atomic_f32;
-pub mod bit_storage;
 pub mod block_box;
 pub mod boundingbox;
 pub mod bounds;
@@ -225,46 +224,6 @@ pub fn fast_inv_cube_root(x: f32) -> f32 {
 #[must_use]
 pub fn magnitude(a: f64, b: f64, c: f64) -> f64 {
     squared_magnitude(a, b, c).sqrt()
-}
-
-#[must_use]
-pub fn length_squared_2d(x: f64, y: f64) -> f64 {
-    x * x + y * y
-}
-
-#[must_use]
-pub fn length_squared_2d_f32(x: f32, y: f32) -> f32 {
-    x * x + y * y
-}
-
-#[must_use]
-pub fn length_2d(x: f64, y: f64) -> f64 {
-    x.hypot(y)
-}
-
-#[must_use]
-pub fn length_2d_f32(x: f32, y: f32) -> f32 {
-    x.hypot(y)
-}
-
-#[must_use]
-pub fn length_squared_3d(x: f64, y: f64, z: f64) -> f64 {
-    x * x + y * y + z * z
-}
-
-#[must_use]
-pub fn length_squared_3d_f32(x: f32, y: f32, z: f32) -> f32 {
-    x * x + y * y + z * z
-}
-
-#[must_use]
-pub fn length_3d(x: f64, y: f64, z: f64) -> f64 {
-    (x * x + y * y + z * z).sqrt()
-}
-
-#[must_use]
-pub fn length_3d_f32(x: f32, y: f32, z: f32) -> f32 {
-    (x * x + y * y + z * z).sqrt()
 }
 
 #[must_use]

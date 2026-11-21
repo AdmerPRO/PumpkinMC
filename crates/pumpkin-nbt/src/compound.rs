@@ -49,11 +49,6 @@ impl NbtCompound {
         }
     }
 
-    /// Advances a reader past a compound's payload without allocating its tags.
-    pub fn skip_content<'a, R: NbtReadHelper<'a>>(reader: &mut R) -> Result<(), Error> {
-        Self::skip_content_depth(reader, 0)
-    }
-
     /// Advances a reader past a compound's payload with depth tracking.
     pub fn skip_content_depth<'a, R: NbtReadHelper<'a>>(
         reader: &mut R,

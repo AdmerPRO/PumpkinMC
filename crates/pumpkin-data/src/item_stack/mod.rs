@@ -48,21 +48,6 @@ pub struct ItemStack {
     pub uid: NonZero<i32>,
 }
 
-// impl Hash for ItemStack {
-//     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-//         self.item_count.hash(state);
-//         self.item.id.hash(state);
-//         self.patch.hash(state);
-//     }
-// }
-
-/*
-impl PartialEq for ItemStack {
-    fn eq(&self, other: &Self) -> bool {
-        self.item.id == other.item.id
-    }
-} */
-
 pub struct ItemStackIdGenerator {
     counter: AtomicU32,
 }

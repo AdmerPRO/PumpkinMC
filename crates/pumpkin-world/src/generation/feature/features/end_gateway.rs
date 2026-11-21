@@ -11,22 +11,6 @@ pub struct EndGatewayFeature {
 }
 
 impl EndGatewayFeature {
-    #[must_use]
-    pub const fn known_exit(exit: BlockPos, exact: bool) -> Self {
-        Self {
-            exit: Some(exit),
-            exact,
-        }
-    }
-
-    #[must_use]
-    pub const fn delayed_exit_search() -> Self {
-        Self {
-            exit: None,
-            exact: false,
-        }
-    }
-
     pub fn generate<T: GenerationCache>(&self, chunk: &mut T, pos: BlockPos) -> bool {
         for dx in -1i32..=1 {
             for dy in -2i32..=2 {

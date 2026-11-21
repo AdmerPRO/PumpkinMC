@@ -180,25 +180,7 @@ pub enum StrongholdPieceType {
     PortalRoom,
     SmallCorridor,
 }
-impl StrongholdPieceType {
-    #[must_use]
-    pub const fn as_structure_type(&self) -> StructurePieceType {
-        match self {
-            Self::Corridor => StructurePieceType::StrongholdCorridor,
-            Self::PrisonHall => StructurePieceType::StrongholdPrisonHall,
-            Self::LeftTurn => StructurePieceType::StrongholdLeftTurn,
-            Self::RightTurn => StructurePieceType::StrongholdRightTurn,
-            Self::SquareRoom => StructurePieceType::StrongholdSquareRoom,
-            Self::Stairs => StructurePieceType::StrongholdStairs,
-            Self::SpiralStaircase => StructurePieceType::StrongholdSpiralStaircase,
-            Self::FiveWayCrossing => StructurePieceType::StrongholdFiveWayCrossing,
-            Self::ChestCorridor => StructurePieceType::StrongholdChestCorridor,
-            Self::Library => StructurePieceType::StrongholdLibrary,
-            Self::PortalRoom => StructurePieceType::StrongholdPortalRoom,
-            Self::SmallCorridor => StructurePieceType::StrongholdSmallCorridor,
-        }
-    }
-}
+impl StrongholdPieceType {}
 
 #[derive(Clone)]
 pub struct PieceWeight {

@@ -2,7 +2,6 @@ use bytes::BufMut;
 use std::ops::{Add, AddAssign, Div, Mul, Sub};
 
 use super::position::BlockPos;
-use super::vector2::Vector2;
 use crate::math::vector_codec_impl;
 use num_traits::{Float, Num};
 use pumpkin_codecs::codec::list::validate_fixed_size;
@@ -189,24 +188,6 @@ impl<T: Math + PartialOrd + Copy> Vector3<T> {
             x: self.x - other.x,
             y: self.y - other.y,
             z: self.z - other.z,
-        }
-    }
-
-    /// Subtracts raw component values from this vector and returns the result.
-    ///
-    /// # Arguments
-    /// - `x` – The X value to subtract.
-    /// - `y` – The Y value to subtract.
-    /// - `z` – The Z value to subtract.
-    ///
-    /// # Returns
-    /// A new vector with the raw values subtracted from each component.
-    #[must_use]
-    pub fn sub_raw(&self, x: T, y: T, z: T) -> Self {
-        Self {
-            x: self.x - x,
-            y: self.y - y,
-            z: self.z - z,
         }
     }
 
@@ -573,19 +554,7 @@ impl<T: Math + Copy + Into<f64>> Vector3<T> {
     }
 }
 
-impl<T: Math + Copy + Into<f32>> Vector3<T> {
-    /// Converts this vector to a `Vector3<f32>`.
-    ///
-    /// # Returns
-    /// A new `Vector3<f32>` with each component converted to `f32`.
-    pub fn to_f32(&self) -> Vector3<f32> {
-        Vector3 {
-            x: self.x.into(),
-            y: self.y.into(),
-            z: self.z.into(),
-        }
-    }
-}
+impl<T: Math + Copy + Into<f32>> Vector3<T> {}
 
 impl<T: Math + Copy + Into<f64>> Vector3<T> {
     /// Rounds each component to the nearest integer and converts to `Vector3<i32>`.
@@ -600,19 +569,6 @@ impl<T: Math + Copy + Into<f64>> Vector3<T> {
             x: x.round() as i32,
             y: y.round() as i32,
             z: z.round() as i32,
-        }
-    }
-
-    /// Rounds the X and Z components to the nearest integer and converts to a 2D vector.
-    ///
-    /// # Returns
-    /// A new `Vector2<i32>` with the X and Z components rounded to the nearest integer.
-    pub fn to_vec2_i32(&self) -> Vector2<i32> {
-        let x: f64 = self.x.into();
-        let z: f64 = self.z.into();
-        Vector2 {
-            x: x.round() as i32,
-            y: z.round() as i32,
         }
     }
 }
@@ -630,19 +586,6 @@ impl<T: Math + Copy + Into<f64>> Vector3<T> {
             x: x.floor() as i32,
             y: y.floor() as i32,
             z: z.floor() as i32,
-        }
-    }
-
-    /// Floors the X and Z components to the nearest integer and converts to a 2D vector.
-    ///
-    /// # Returns
-    /// A new `Vector2<i32>` with the X and Z components floored to the nearest integer.
-    pub fn floor_to_vec2_i32(&self) -> Vector2<i32> {
-        let x: f64 = self.x.into();
-        let z: f64 = self.z.into();
-        Vector2 {
-            x: x.floor() as i32,
-            y: z.floor() as i32,
         }
     }
 }

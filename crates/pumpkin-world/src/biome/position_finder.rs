@@ -507,12 +507,4 @@ impl<T: Clone> ParameterList<T> {
     pub fn find_value_index(&self, target: &TargetPoint) -> &T {
         self.index.search(target)
     }
-
-    pub fn find_value_index_with_metric(
-        &self,
-        target: &TargetPoint,
-        distance_metric: &impl DistanceMetric<T>,
-    ) -> &T {
-        self.index.search_with_metric(target, distance_metric)
-    }
 }

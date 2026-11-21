@@ -32,15 +32,7 @@ pub enum LoadedData<D: Send, Err: error::Error> {
     Error((Vector2<i32>, Err)),
 }
 
-impl<D: Send, E: error::Error> LoadedData<D, E> {
-    pub fn map_loaded<D2: Send>(self, map: impl FnOnce(D) -> D2) -> LoadedData<D2, E> {
-        match self {
-            Self::Loaded(data) => LoadedData::Loaded(map(data)),
-            Self::Missing(pos) => LoadedData::Missing(pos),
-            Self::Error(err) => LoadedData::Error(err),
-        }
-    }
-}
+impl<D: Send, E: error::Error> LoadedData<D, E> {}
 
 pub trait Dirtiable {
     fn is_dirty(&self) -> bool;

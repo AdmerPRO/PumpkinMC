@@ -22,8 +22,6 @@ use pumpkin_data::sound::Sound;
 use pumpkin_data::tag::{self, BannerPattern, RegistryKey, Taggable, get_tag_values};
 use pumpkin_protocol::java::server::play::SlotActionType;
 
-pub const NO_ITEM_REQUIRED_PATTERNS: &[&str] = BannerPattern::MINECRAFT_NO_ITEM_REQUIRED.0;
-
 #[must_use]
 pub fn is_banner_item(item: &Item) -> bool {
     item.registry_key.ends_with("_banner")

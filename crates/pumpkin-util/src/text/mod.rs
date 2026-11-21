@@ -1702,15 +1702,6 @@ impl TextComponent {
         self
     }
 
-    /// Appends a new line/line break.
-    ///
-    /// # Returns
-    /// The component with a new line appended.
-    #[must_use]
-    pub fn new_line(self) -> Self {
-        self.add_child(Self::text("\n"))
-    }
-
     /// Applies a color gradient to the text using named colors.
     ///
     /// # Arguments

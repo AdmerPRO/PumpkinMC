@@ -205,18 +205,6 @@ impl BlockBox {
             && self.min.y <= other.max.y
     }
 
-    /// Returns `true` if this box intersects another box in the XZ plane.
-    ///
-    /// # Arguments
-    /// * `other` – Other box to test.
-    #[must_use]
-    pub const fn intersects_xz(&self, other: &Self) -> bool {
-        self.max.x >= other.min.x
-            && self.min.x <= other.max.x
-            && self.max.z >= other.min.z
-            && self.min.z <= other.max.z
-    }
-
     /// Returns `true` if this box intersects given raw XZ coordinates.
     ///
     /// # Arguments
@@ -236,22 +224,10 @@ impl BlockBox {
         )
     }
 
-    /// Returns the number of blocks along the X axis.
-    #[must_use]
-    pub const fn get_block_count_x(&self) -> i32 {
-        self.max.x - self.min.x + 1
-    }
-
     /// Returns the number of blocks along the Y axis.
     #[must_use]
     pub const fn get_block_count_y(&self) -> i32 {
         self.max.y - self.min.y + 1
-    }
-
-    /// Returns the number of blocks along the Z axis.
-    #[must_use]
-    pub const fn get_block_count_z(&self) -> i32 {
-        self.max.z - self.min.z + 1
     }
 
     /// Expands this box to encompass another box.

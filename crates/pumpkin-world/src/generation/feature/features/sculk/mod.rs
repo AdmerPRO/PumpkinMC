@@ -146,14 +146,6 @@ pub fn shrieker_state(can_summon: bool) -> &'static BlockState {
     BlockState::from_id(properties.to_state_id(&Block::SCULK_SHRIEKER))
 }
 
-/// Convenience: resolve the block id at a position, defaulting to air when
-/// unwritable.
-pub fn sculk_block_id(level: &dyn SculkLevel, pos: BlockPos) -> BlockId {
-    level
-        .sculk_get(pos)
-        .map_or(BlockId::AIR, BlockStateId::to_block_id)
-}
-
 // Blanket impl for any type implementing GenerationCache (post-terrain case).
 
 use crate::generation::proto_chunk::GenerationCache;

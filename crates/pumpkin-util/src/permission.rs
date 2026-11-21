@@ -248,15 +248,6 @@ impl PermissionManager {
         }
     }
 
-    /// Creates a new `PermissionManager` with an existing `PermissionRegistry`.
-    #[must_use]
-    pub fn with_registry(registry: PermissionRegistry) -> Self {
-        Self {
-            registry,
-            attachments: DashMap::new(),
-        }
-    }
-
     /// Registers a new permission node in the global registry.
     pub fn register_permission(&self, permission: Permission) -> Result<(), String> {
         self.registry.register_permission(permission)
@@ -282,12 +273,6 @@ impl PermissionManager {
         self.registry.set_default(node, default)
     }
 
-    /// Checks whether a permission node exists in the registry.
-    #[must_use]
-    pub fn has_registered_permission(&self, node: &str) -> bool {
-        self.registry.has_permission(node)
-    }
-
     /// Sets a player's explicit permission.
     pub fn set_permission(&self, player_id: uuid::Uuid, node: impl Into<String>, value: bool) {
         self.attachments
@@ -309,21 +294,6 @@ impl PermissionManager {
         self.attachments
             .get(player_id)
             .and_then(|p| p.get(node).as_deref().copied())
-    }
-
-    /// Removes all permission attachments for a player.
-    pub fn remove_attachment(&self, player_id: &uuid::Uuid) {
-        self.attachments.remove(player_id);
-    }
-
-    /// Retrieves all explicitly assigned permissions for a player.
-    #[must_use]
-    pub fn get_player_permissions(&self, player_id: &uuid::Uuid) -> Option<HashMap<String, bool>> {
-        self.attachments.get(player_id).map(|p| {
-            p.iter()
-                .map(|item| (item.key().clone(), *item.value()))
-                .collect()
-        })
     }
 
     /// Checks if a player has a specific permission.

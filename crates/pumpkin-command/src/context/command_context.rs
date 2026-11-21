@@ -343,15 +343,6 @@ impl<'a, S: CommandSource> ContextChain<'a, S> {
         }
     }
 
-    /// Gets a mutable reference to the top context of this chain.
-    pub fn get_top_context_mut(&'_ mut self) -> &mut Arc<CommandContext<'a, S>> {
-        if self.modifiers.is_empty() {
-            &mut self.execute
-        } else {
-            &mut self.modifiers[0]
-        }
-    }
-
     /// Gets the next stage of this chain.
     #[must_use]
     pub fn next_stage(&self) -> Option<Self> {

@@ -459,22 +459,6 @@ impl BlockPos {
         ))
     }
 
-    /// Creates a `BlockPos` by ceiling the given vector.
-    ///
-    /// # Arguments
-    /// - `pos` – The `Vector3<f64>` to ceiling.
-    ///
-    /// # Returns
-    /// A `BlockPos` with each component ceiled to the nearest integer.
-    #[must_use]
-    pub const fn ceiled_v(pos: Vector3<f64>) -> Self {
-        Self(Vector3::new(
-            pos.x.ceil() as i32,
-            pos.y.ceil() as i32,
-            pos.z.ceil() as i32,
-        ))
-    }
-
     /// Converts this block position to a `Vector3<f64>` with 0.5 added to X and Z.
     ///
     /// This centers the position on the block's X and Z axes while keeping

@@ -264,16 +264,6 @@ impl<S: CommandSource> AttachedNode<S> {
         }
     }
 
-    /// Gets an [`Option`] of a mutable reference to the redirection of this node.
-    pub const fn redirect_mut_ref(&mut self) -> Option<&mut Redirection> {
-        match self {
-            Self::Root(_) => None,
-            Self::Literal(node) => node.redirect.as_mut(),
-            Self::Command(node) => node.redirect.as_mut(),
-            Self::Argument(node) => node.redirect.as_mut(),
-        }
-    }
-
     /// Sets the redirection of this node.
     pub const fn set_redirect(&mut self, redirect: Option<Redirection>) {
         match self {
@@ -290,31 +280,16 @@ impl<S: CommandSource> AttachedNode<S> {
         &self.owned_node_data_ref().requirements
     }
 
-    /// Overrides all the requirements for this node to be run to a value.
-    pub fn set_requirement(&mut self, requirements: Requirements<S>) {
-        self.owned_node_data_mut_ref().requirements = requirements;
-    }
-
     /// Gets the modifier for this node to be run.
     #[must_use]
     pub const fn modifier(&self) -> &RedirectModifier<S> {
         &self.owned_node_data_ref().modifier
     }
 
-    /// Sets the modifier for this node to a value.
-    pub fn set_modifier(&mut self, modifier: RedirectModifier<S>) {
-        self.owned_node_data_mut_ref().modifier = modifier;
-    }
-
     /// Whether this node forks `CommandSources` or not.
     #[must_use]
     pub const fn forks(&self) -> bool {
         self.owned_node_data_ref().forks
-    }
-
-    /// Sets whether this node forks `CommandSources` or not.
-    pub const fn set_forks(&mut self, forks: bool) {
-        self.owned_node_data_mut_ref().forks = forks;
     }
 
     /// Gets the executable command for this node.

@@ -301,11 +301,6 @@ impl<'a> ChunkVeinRouter<'a> {
 
 impl<'a> ChunkNoiseRouter<'a> {
     #[must_use]
-    pub fn component_stack_mut(&mut self) -> &mut [ChunkNoiseFunctionComponent<'a>] {
-        &mut self.component_stack
-    }
-
-    #[must_use]
     pub fn generate(
         base: &'a ProtoNoiseRouter,
         build_options: &ChunkNoiseFunctionBuilderOptions,

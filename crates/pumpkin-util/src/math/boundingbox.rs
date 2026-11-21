@@ -12,15 +12,6 @@ pub struct BoundingBox {
 }
 
 impl BoundingBox {
-    /// Creates a default bounding box at the origin using entity dimensions.
-    ///
-    /// # Arguments
-    /// * `size` – Dimensions of the entity.
-    #[must_use]
-    pub fn new_default(size: &EntityDimensions) -> Self {
-        Self::new_from_pos(0., 0., 0., size)
-    }
-
     /// Creates a bounding box from a position and entity dimension.
     ///
     /// # Arguments
@@ -408,27 +399,6 @@ impl BoundingBox {
         }
 
         new
-    }
-
-    /// Creates a bounding box from a block position with zero volume.
-    ///
-    /// # Arguments
-    /// * `position` – Block position to base the bounding box on.
-    #[must_use]
-    pub fn from_block_raw(position: &BlockPos) -> Self {
-        let position = position.0;
-        Self {
-            min: Vector3::new(
-                f64::from(position.x),
-                f64::from(position.y),
-                f64::from(position.z),
-            ),
-            max: Vector3::new(
-                f64::from(position.x),
-                f64::from(position.y),
-                f64::from(position.z),
-            ),
-        }
     }
 
     /// Checks if this bounding box intersects another bounding box.

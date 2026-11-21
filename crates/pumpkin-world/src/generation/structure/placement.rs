@@ -469,48 +469,6 @@ impl GlobalStructureCache {
         }
     }
 
-    #[must_use]
-    pub fn calculate_strongholds_without_biomes(
-        seed: i64,
-        placement: &ConcentricRingsStructurePlacement,
-    ) -> Vec<(i32, i32)> {
-        let distance_param = f64::from(placement.distance);
-        let mut spread = placement.spread;
-        let count = placement.count;
-
-        let mut random = LegacyRand::from_seed(seed as u64);
-        let mut angle = random.next_f64() * PI * 2.0;
-        let mut position_in_circle = 0;
-        let mut circle = 0;
-
-        let mut chunks = Vec::with_capacity(count as usize);
-
-        for i in 0..count {
-            let dist = 4.0 * distance_param
-                + distance_param * f64::from(circle) * 6.0
-                + (random.next_f64() - 0.5) * (distance_param * 2.5);
-
-            let initial_x = (angle.cos() * dist + 0.5).floor() as i32;
-            let initial_z = (angle.sin() * dist + 0.5).floor() as i32;
-
-            chunks.push((initial_x, initial_z));
-
-            angle += (PI * 2.0) / f64::from(spread);
-            position_in_circle += 1;
-
-            if position_in_circle == spread {
-                circle += 1;
-                position_in_circle = 0;
-
-                spread += 2 * spread / (circle + 1);
-                spread = spread.min(count - i);
-                angle += random.next_f64() * PI * 2.0;
-            }
-        }
-
-        chunks
-    }
-
     /// Retrieves the list of chunk coordinates for Concentric Ring structures.
     /// If the cache is empty, it calculates the 128 ring positions.
     pub fn get_or_calculate_strongholds(

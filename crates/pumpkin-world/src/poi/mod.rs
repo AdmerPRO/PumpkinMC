@@ -170,11 +170,6 @@ impl PoiRegion {
         self.dirty
     }
 
-    pub fn mark_clean(&mut self) {
-        self.dirty = false;
-        self.dirty_chunks.clear();
-    }
-
     /// Group entries by chunk, then create chunk NBT data
     fn get_chunk_data(&self, chunk_x: i32, chunk_z: i32) -> Option<PoiChunkData> {
         let mut sections: FxHashMap<String, PoiSectionData> = FxHashMap::default();
@@ -984,12 +979,6 @@ impl PoiStorage {
             info!("Saved {saved} POI region(s)");
         }
         Ok(())
-    }
-
-    /// Get count of loaded regions
-    #[must_use]
-    pub fn loaded_region_count(&self) -> usize {
-        self.regions.len()
     }
 
     /// Get total POI count across all loaded regions

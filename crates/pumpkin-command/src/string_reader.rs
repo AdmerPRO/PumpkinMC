@@ -83,13 +83,6 @@ impl<'a> StringReader<'a> {
         self.byte_cursor + length <= self.string.len()
     }
 
-    /// Returns whether the reader is able to read 1 more byte
-    /// without going out of bounds.
-    #[must_use]
-    pub fn can_read_byte(&self) -> bool {
-        self.can_read_bytes(1)
-    }
-
     /// Returns whether the reader is able to read `length` more [`char`]s
     /// without going out of bounds.
     #[must_use]

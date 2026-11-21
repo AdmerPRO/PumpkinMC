@@ -187,23 +187,6 @@ impl TextComponent {
         self.to_legacy_string_with_code_for_version(version, '§', locale)
     }
 
-    /// Serializes this component into a legacy formatted string using a custom color code symbol.
-    ///
-    /// # Arguments
-    /// - `code_symbol` – The formatting character symbol (e.g., `'§'` or `'&'`).
-    /// - `locale` – The locale to use for resolving translation components.
-    ///
-    /// # Returns
-    /// A legacy formatted string with color and style codes using `code_symbol`.
-    #[must_use]
-    pub fn to_legacy_string_with_code(&self, code_symbol: char, locale: Locale) -> String {
-        self.to_legacy_string_with_code_for_version(
-            &crate::version::JavaMinecraftVersion::V_26_3,
-            code_symbol,
-            locale,
-        )
-    }
-
     /// Serializes this component into a legacy formatted string for a specific Minecraft version.
     ///
     /// # Arguments

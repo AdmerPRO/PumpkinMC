@@ -27,9 +27,33 @@ pub fn update_locked_stack<S: AsMut<[ItemStack]> + ?Sized>(
 
 // Utility functions for split_stack
 pub fn split_stack_slice(stacks: &mut [ItemStack], slot: usize, amount: u8) -> ItemStack {
-    if slot < stacks.len() && !stacks[slot].is_empty() && amount > 0 {
+    if !stacks[slot].is_empty() && amount > 0 {
         stacks[slot].split(amount)
     } else {
         ItemStack::EMPTY.clone()
     }
+}
+
+/// Replaces a slot behind one lock, holding the write lock across the write.
+pub fn set_locked_stack<S: AsMut<[ItemStack]> + ?Sized>(
+    stacks: &RwLock<S>,
+    slot: usize,
+    stack: ItemStack,
+) {
+    stacks
+        .write()
+        .unwrap_or_else(std::sync::PoisonError::into_inner)
+        .as_mut()[slot] = stack;
+}
+
+/// Splits `amount` off a slot behind one lock, using the same slot handling as [`split_stack_slice`].
+pub fn split_locked_stack<S: AsMut<[ItemStack]> + ?Sized>(
+    stacks: &RwLock<S>,
+    slot: usize,
+    amount: u8,
+) -> ItemStack {
+    let mut stacks = stacks
+        .write()
+        .unwrap_or_else(std::sync::PoisonError::into_inner);
+    split_stack_slice(stacks.as_mut(), slot, amount)
 }
